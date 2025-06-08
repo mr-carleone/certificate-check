@@ -1,0 +1,58 @@
+[tool.black]
+line-length = 100
+target-version = ['py312']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+[tool.poetry]
+name = "load-certificate"
+version = "0.1.0"
+description = "A service for checking and updating SSL certificates"
+authors = ["Your Name <your.email@example.com>"]
+readme = "README.md"
+packages = [{include = "app"}]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.110.0"
+uvicorn = "^0.27.1"
+python-multipart = "^0.0.9"
+cryptography = "^42.0.5"
+python-jose = "^3.3.0"
+pydantic = "^2.6.3"
+pydantic-settings = "^2.2.1"
+python-dotenv = "^1.0.1"
+colorlog = "^6.8.2"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.4.0"
+pytest-asyncio = "^1.0.0"
+pytest-cov = "^6.1.1"
+black = "^25.1.0"
+flake8 = "^7.2.0"
+mypy = "^1.16.0"
+
+[tool.poetry.group.test.dependencies]
+pytest = "^8.4.0"
+pytest-asyncio = "^1.0.0"
+pytest-cov = "^6.1.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3

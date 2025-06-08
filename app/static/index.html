@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificate Manager</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .host-card {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+
+        .certificate {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-radius: 3px;
+        }
+
+        .needs-update {
+            background-color: #fff3cd;
+        }
+
+        .error {
+            color: red;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        input[type="text"] {
+            padding: 8px;
+            width: 300px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Certificate Manager</h1>
+
+    <div>
+        <input type="text" id="hostInput" placeholder="Enter host URL (e.g., example.com)">
+        <button onclick="addHost()">Add Host</button>
+    </div>
+
+    <div id="hostsList"></div>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+        let hosts = [];
+
+        async function checkCertificates() {
+            try {
+                const response = await fetch(`${API_URL}/check-certificates`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(hosts),
+                });
+                const data = await response.json();
+                displayResults(data);
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        function displayResults(results) {
+            const hostsList = document.getElementById('hostsList');
+            hostsList.innerHTML = '';
+
+            results.forEach(host => {
+                const hostCard = document.createElement('div');
+                hostCard.className = 'host-card';
+                hostCard.innerHTML = `
+                    <h2>${host.hostname}</h2>
+                    ${host.certificates.map(cert => `
+                        <div class="certificate ${cert.needs_update ? 'needs-update' : ''}">
+                            <p>URL: ${cert.url}</p>
+                            <p>Valid until: ${cert.valid_until || 'N/A'}</p>
+                            ${cert.error ? `<p class="error">Error: ${cert.error}</p>` : ''}
+                            ${cert.needs_update ? `
+                                <button onclick="updateCertificate('${host.hostname}', '${cert.url}')">
+                                    Update Certificate
+                                </button>
+                            ` : ''}
+                        </div>
+                    `).join('')}
+                `;
+                hostsList.appendChild(hostCard);
+            });
+        }
+
+        async function updateCertificate(host, url) {
+            try {
+                const response = await fetch(`${API_URL}/update-certificate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ host, url }),
+                });
+                const data = await response.json();
+                alert(data.message);
+                checkCertificates();
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to update certificate');
+            }
+        }
+
+        function addHost() {
+            const input = document.getElementById('hostInput');
+            const host = input.value.trim();
+
+            if (host && !hosts.includes(host)) {
+                hosts.push(host);
+                input.value = '';
+                checkCertificates();
+            }
+        }
+
+        // Check certificates every 5 minutes
+        setInterval(checkCertificates, 300000);
+    </script>
+</body>
+
+</html>
