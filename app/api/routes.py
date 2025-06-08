@@ -6,9 +6,11 @@ from app.core.logging import logger
 
 router: APIRouter = APIRouter()  # type: ignore
 
+
 @router.get("/")  # type: ignore
 async def root():
     return {"message": "Certificate Manager API"}
+
 
 @router.post("/check-certificates", response_model=List[HostInfo])  # type: ignore
 async def check_certificates(hosts: List[str]) -> List[HostInfo]:
@@ -21,6 +23,7 @@ async def check_certificates(hosts: List[str]) -> List[HostInfo]:
     except Exception as e:
         logger.error(f"Error checking certificates: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @router.post("/update-certificate")  # type: ignore
 async def update_certificate(host: str, url: str):

@@ -4,25 +4,26 @@ from datetime import datetime, timedelta
 from app.services.certificate_service import CertificateService
 from app.models.certificate import CertificateInfo, HostInfo
 
+
 @pytest.fixture
 def mock_ssl_context():
-    with patch('ssl.create_default_context') as mock:
+    with patch("ssl.create_default_context") as mock:
         context = MagicMock()
         mock.return_value = context
         yield context
 
+
 @pytest.fixture
 def mock_socket():
-    with patch('socket.create_connection') as mock:
+    with patch("socket.create_connection") as mock:
         sock = MagicMock()
         mock.return_value.__enter__.return_value = sock
         yield sock
 
+
 def test_check_certificate_valid(mock_ssl_context, mock_socket):
     # Mock certificate data
-    cert_data = {
-        'notAfter': 'Dec 31 23:59:59 2025 GMT'
-    }
+    cert_data = {"notAfter": "Dec 31 23:59:59 2025 GMT"}
 
     # Setup mock SSL socket
     mock_ssl_socket = MagicMock()
@@ -37,6 +38,7 @@ def test_check_certificate_valid(mock_ssl_context, mock_socket):
     assert result.needs_update is False
     assert result.error is None
 
+
 def test_check_certificate_invalid(mock_ssl_context, mock_socket):
     # Mock connection error
     mock_socket.side_effect = Exception("Connection failed")
@@ -49,11 +51,10 @@ def test_check_certificate_invalid(mock_ssl_context, mock_socket):
     assert result.needs_update is True
     assert result.error is not None
 
+
 def test_check_host_certificates(mock_ssl_context, mock_socket):
     # Mock certificate data
-    cert_data = {
-        'notAfter': 'Dec 31 23:59:59 2025 GMT'
-    }
+    cert_data = {"notAfter": "Dec 31 23:59:59 2025 GMT"}
 
     # Setup mock SSL socket
     mock_ssl_socket = MagicMock()

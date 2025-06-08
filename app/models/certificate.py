@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from datetime import datetime
 from typing import Optional, List
 
+
 class CertificateInfo(BaseModel):
     url: str
     valid_until: Optional[datetime] = None
@@ -10,6 +11,7 @@ class CertificateInfo(BaseModel):
 
     class Config:
         orm_mode = True
+
 
 class HostInfo(BaseModel):
     hostname: str

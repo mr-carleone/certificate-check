@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
 class Settings(BaseSettings):
     APP_NAME: str = "Certificate Manager"
     DEBUG: bool = False
@@ -21,5 +22,6 @@ class Settings(BaseSettings):
         else:
             env_file = ".env"
         case_sensitive = True
+
 
 settings = Settings()
